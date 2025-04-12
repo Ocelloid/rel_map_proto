@@ -1,7 +1,6 @@
-"use client";
-import { buttonVariants } from "~/components/ui/button";
 import Image from "next/image";
 import Link from "next/link";
+import Characters from "~/components/characters";
 
 export default function Header() {
   return (
@@ -15,9 +14,7 @@ export default function Header() {
           className="h-16 w-16"
         />
       </Link>
-      <Link className={buttonVariants({ variant: "ghost" })} href="/characters">
-        Персонажи
-      </Link>
+      <Characters />
     </div>
   );
 }
