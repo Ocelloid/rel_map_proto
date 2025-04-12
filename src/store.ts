@@ -10,6 +10,7 @@ export type Character = {
 type GraphNode = {
   id: string;
   name: string;
+  group: string;
   val: number;
 };
 
@@ -44,20 +45,22 @@ function CharactersToGraph(characters: Character[]) {
     nodes.push({
       id: characterId,
       name: character.name,
-      val: 0,
+      group: "characters",
+      val: 10,
     });
     character.tags.split(",").forEach((tag) => {
       const trimmed = tag.trim();
       if (trimmed === "") return;
-      if (nodes.some((node) => node.name === trimmed)) return;
-      nodes.push({
-        id: trimmed,
-        name: trimmed,
-        val: 5,
-      });
+      if (!nodes.some((node) => node.name === trimmed))
+        nodes.push({
+          id: trimmed,
+          name: trimmed,
+          group: "tags",
+          val: 5,
+        });
       links.push({
         source: characterId,
-        target: tag,
+        target: trimmed,
       });
     });
   });
