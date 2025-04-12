@@ -11,36 +11,35 @@ import {
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
 import { Button } from "~/components/ui/button";
-import { FaTimes, FaPencilAlt, FaTrashAlt } from "react-icons/fa";
+import { FaTimes, FaPencilAlt, FaTrashAlt, FaList } from "react-icons/fa";
 import { ScrollArea } from "~/components/ui/scroll-area";
 import Image from "next/image";
 import { useStore, type Character } from "~/store";
+import { useState, useEffect } from "react";
 
 export default function Characters() {
+  const [isOpen, setIsOpen] = useState(false);
   const { characters } = useStore();
+  useEffect(() => {
+    setIsOpen(true);
+  }, []);
   return (
-    <Drawer direction="left">
-      <DrawerTrigger className="cursor-pointer rounded-full text-2xl">
-        <Image
-          src="/favicon.png"
-          alt="logo"
-          width={128}
-          height={128}
-          className="h-16 w-16"
-        />
+    <Drawer direction="left" open={isOpen} onOpenChange={setIsOpen}>
+      <DrawerTrigger className="cursor-pointer rounded-full px-4">
+        <FaList size={64} color="white" />
       </DrawerTrigger>
       <DrawerContent data-vaul-no-drag>
         <DrawerHeader>
           <DrawerTitle>Персонажи</DrawerTitle>
           <DrawerDescription>
-            Вы можете создавать и редактировать персонажей и их теги.
+            Здесь вы можете создавать и редактировать персонажей и их теги.
           </DrawerDescription>
           <DrawerClose className="absolute right-4 cursor-pointer">
             <FaTimes />
           </DrawerClose>
         </DrawerHeader>
         <CharacterForm />
-        <ScrollArea className="h-full p-4">
+        <ScrollArea className="h-[calc(100dvh-256px)] p-4">
           {characters.map((character, i) => (
             <CharacterListItem character={character} key={i} index={i} />
           ))}
@@ -121,7 +120,7 @@ function CharacterForm() {
         <Input
           type="text"
           id="name"
-          placeholder="Имя"
+          placeholder="Введите имя"
           value={name}
           onChange={(e) => setName(e.target.value)}
         />
@@ -131,7 +130,7 @@ function CharacterForm() {
         <Input
           type="text"
           id="tags"
-          placeholder="Теги"
+          placeholder="Введите теги через запятую"
           value={tags}
           onChange={(e) => setTags(e.target.value)}
         />

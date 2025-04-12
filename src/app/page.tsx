@@ -1,6 +1,6 @@
 "use client";
-import Header from "~/components/header";
-import Graph from "~/components/graph";
+import Header from "~/components/Header";
+import Graph from "~/components/Graph";
 import NoSSR from "~/components/NoSSR";
 export default function HomePage() {
   return (
