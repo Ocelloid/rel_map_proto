@@ -1,7 +1,12 @@
 "use client";
 import Characters from "~/components/Characters";
 import { Button } from "./ui/button";
-import { useGraphStore, type Character } from "~/store";
+import {
+  useGraphStore,
+  useCustomLinksStore,
+  type Character,
+  type GraphLink,
+} from "~/store";
 import { FaDownload, FaUpload } from "react-icons/fa";
 import { useRef } from "react";
 import CustomLinks from "./CustomLinks";
@@ -9,12 +14,13 @@ import CustomLinks from "./CustomLinks";
 export default function Header() {
   const inputRef = useRef<HTMLInputElement>(null);
   const { characters, setCharacters } = useGraphStore();
+  const { customLinks, setCustomLinks } = useCustomLinksStore();
   const downloadJSON = () => {
     const confirmed = confirm(
       `Вы уверены, что хотите сохранить список персонажей?`,
     );
     if (!confirmed) return;
-    const blob = new Blob([JSON.stringify({ characters })], {
+    const blob = new Blob([JSON.stringify({ characters, customLinks })], {
       type: "text/json",
     });
     const link = document.createElement("a");
@@ -44,9 +50,12 @@ export default function Header() {
     reader.onload = (event) => {
       const res = JSON.parse(event.target?.result as string) as {
         characters: Character[];
+        customLinks: GraphLink[];
       };
       if (!!res.characters && !!res.characters.length)
         setCharacters(res.characters);
+      if (!!res.customLinks && !!res.customLinks.length)
+        setCustomLinks(res.customLinks);
     };
     reader.readAsText(file);
   }

@@ -148,7 +148,16 @@ export const useCustomLinksStore = create(
     (set, get) => ({
       customLinks: [],
       setCustomLinks: (customLinks) => {
-        set({ customLinks });
+        set({
+          customLinks: customLinks.map((link) => ({
+            index: link.index,
+            source: (link.source as GraphNode).id,
+            target: (link.target as GraphNode).id,
+            title: link.title,
+            color: link.color,
+            group: link.group,
+          })),
+        });
       },
       addCustomLink: (customLink) => {
         const newCustomLinks = [...get().customLinks, customLink];
