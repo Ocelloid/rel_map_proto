@@ -37,7 +37,10 @@ export default function Characters() {
       <DrawerTrigger className="cursor-pointer rounded-full px-4 text-white hover:text-blue-50">
         <FaList size={64} />
       </DrawerTrigger>
-      <DrawerContent data-vaul-no-drag>
+      <DrawerContent
+        data-vaul-no-drag
+        className="data-[vaul-drawer-direction=left]:w-full"
+      >
         <DrawerHeader>
           <DrawerTitle>Персонажи</DrawerTitle>
           <DrawerDescription>

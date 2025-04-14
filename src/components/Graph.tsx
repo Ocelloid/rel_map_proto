@@ -81,7 +81,7 @@ export default function Graph() {
         const nodeEl = document.createElement("div");
         nodeEl.textContent = node.name;
         nodeEl.style.color = "white";
-        nodeEl.style.fontSize = node.group === "tags" ? "1rem" : "2rem";
+        nodeEl.style.fontSize = node.group === "tags" ? "1rem" : "1.5rem";
         nodeEl.style.textShadow =
           "-1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000";
         nodeEl.className = "node-label";
