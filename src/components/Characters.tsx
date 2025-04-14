@@ -51,7 +51,7 @@ export default function Characters() {
           </DrawerClose>
         </DrawerHeader>
         <CharacterForm />
-        <ScrollArea className="h-[calc(100dvh-256px)] p-4">
+        <ScrollArea className="h-[calc(100dvh-300px)] p-4 sm:h-[calc(100dvh-276px)]">
           {characters.map((character, i) => (
             <CharacterListItem character={character} key={i} index={i} />
           ))}
