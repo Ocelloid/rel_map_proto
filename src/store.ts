@@ -5,12 +5,16 @@ import { createId } from "@paralleldrive/cuid2";
 export type Character = {
   name: string;
   tags: string;
+  color: string;
+  shape: string;
 };
 
 type GraphNode = {
   id: string;
   name: string;
   group: string;
+  color?: string;
+  shape?: string;
   val: number;
 };
 
@@ -26,6 +30,8 @@ interface State {
   editing: boolean;
   name: string;
   tags: string;
+  color: string;
+  shape: string;
 }
 
 interface Actions {
@@ -35,6 +41,8 @@ interface Actions {
   setEditing: (editing: boolean) => void;
   setName: (name: string) => void;
   setTags: (tags: string) => void;
+  setColor: (color: string) => void;
+  setShape: (shape: string) => void;
 }
 
 function CharactersToGraph(characters: Character[]) {
@@ -45,6 +53,8 @@ function CharactersToGraph(characters: Character[]) {
     nodes.push({
       id: characterId,
       name: character.name,
+      color: character.color,
+      shape: character.shape,
       group: "characters",
       val: 10,
     });
@@ -75,6 +85,8 @@ export const useStore = create(
       links: [],
       name: "",
       tags: "",
+      color: "pink",
+      shape: "sphere",
       editing: false,
       setEditing: (editing) => {
         set({ editing });
@@ -84,6 +96,12 @@ export const useStore = create(
       },
       setTags: (tags) => {
         set({ tags });
+      },
+      setColor: (color) => {
+        set({ color });
+      },
+      setShape: (shape) => {
+        set({ shape });
       },
       setCharacters: (characters) => {
         const { nodes, links } = CharactersToGraph(characters);
