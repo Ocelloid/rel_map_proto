@@ -9,7 +9,14 @@ import dynamic from "next/dynamic";
 import { useEffect, useRef } from "react";
 import { UnrealBloomPass } from "three/addons/postprocessing/UnrealBloomPass.js";
 import type { ForceGraphMethods } from "react-force-graph-3d";
-import { Mesh, Vector2, SphereGeometry, MeshLambertMaterial } from "three";
+import {
+  Mesh,
+  Vector2,
+  SphereGeometry,
+  MeshLambertMaterial,
+  Vector3,
+} from "three";
+import SpriteText from "three-spritetext";
 const Dynamic3DGraph = dynamic(() => import("./Dynamic3DGraph"), {
   ssr: false,
 });
@@ -71,6 +78,31 @@ export default function Graph() {
       backgroundColor="#00000000"
       cooldownTicks={40}
       onEngineStop={() => fgRef?.current?.zoomToFit(400)}
+      linkDirectionalParticles={4}
+      linkDirectionalParticleWidth={(link) => (link.group === "custom" ? 1 : 0)}
+      linkThreeObject={(link) => {
+        // extend link with text sprite
+        const sprite = new SpriteText(link.title as string);
+        sprite.color = "black";
+        sprite.textHeight = 1.5;
+        return sprite;
+      }}
+      linkPositionUpdate={(sprite, { start, end }) => {
+        const calcMiddle = (a: number, b: number) => b + (a - b) / 2;
+        Object.assign(
+          sprite.position,
+          new Vector3(
+            calcMiddle(start.x, end.x),
+            calcMiddle(start.y, end.y),
+            calcMiddle(start.z, end.z),
+          ),
+        );
+      }}
+      onNodeDragEnd={(node) => {
+        node.fx = node.x;
+        node.fy = node.y;
+        node.fz = node.z;
+      }}
     />
   );
 }

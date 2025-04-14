@@ -24,6 +24,8 @@ export type GraphLink = {
   target: string | GraphNode;
   title?: string;
   color?: string;
+  index?: number;
+  group?: string;
 };
 
 interface LinkFormState {

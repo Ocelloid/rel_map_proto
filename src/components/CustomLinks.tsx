@@ -84,7 +84,7 @@ function LinkForm() {
   const { addCustomLink } = useCustomLinksStore();
   const { nodes } = useGraphStore();
   const handleSubmit = () => {
-    addCustomLink({ source, target, title, color });
+    addCustomLink({ source, target, title, color, group: "custom" });
     setLinkEditing(false);
     setSource("");
     setTarget("");
