@@ -9,6 +9,10 @@ export default function Header() {
   const inputRef = useRef<HTMLInputElement>(null);
   const { characters, setCharacters } = useStore();
   const downloadJSON = () => {
+    const confirmed = confirm(
+      `Вы уверены, что хотите сохранить список персонажей?`,
+    );
+    if (!confirmed) return;
     const blob = new Blob([JSON.stringify({ characters })], {
       type: "text/json",
     });
@@ -59,6 +63,7 @@ export default function Header() {
         <Button
           variant={"link"}
           onClick={downloadJSON}
+          title="Сохранить список персонажей"
           className="cursor-pointer text-white hover:text-blue-50"
         >
           <FaDownload className="size-8 sm:size-12" />
@@ -66,6 +71,7 @@ export default function Header() {
         <Button
           variant={"link"}
           onClick={uploadJSON}
+          title="Загрузить список персонажей"
           className="cursor-pointer text-white hover:text-blue-50"
         >
           <FaUpload className="size-8 sm:size-12" />
