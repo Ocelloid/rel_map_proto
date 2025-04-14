@@ -53,7 +53,7 @@ export default function Header() {
   }
 
   return (
-    <div className="fixed top-0 z-50 flex h-32 w-full flex-row items-center justify-between bg-transparent p-4">
+    <div className="fixed top-0 z-50 flex h-16 w-full flex-row items-center justify-between bg-transparent p-4 sm:h-24">
       <Characters />
       <div className="flex h-32 flex-row items-center gap-4">
         <Button
@@ -61,14 +61,14 @@ export default function Header() {
           onClick={downloadJSON}
           className="cursor-pointer text-white hover:text-blue-50"
         >
-          <FaDownload size={16} className="size-16" />
+          <FaDownload className="size-8 sm:size-12" />
         </Button>
         <Button
           variant={"link"}
           onClick={uploadJSON}
           className="cursor-pointer text-white hover:text-blue-50"
         >
-          <FaUpload size={16} className="size-16" />
+          <FaUpload className="size-8 sm:size-12" />
         </Button>
         <input ref={inputRef} type="file" hidden onChange={handleFileUpload} />
       </div>

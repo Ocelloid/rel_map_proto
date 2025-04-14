@@ -34,8 +34,8 @@ export default function Characters() {
   }, []);
   return (
     <Drawer direction="left" open={isOpen} onOpenChange={setIsOpen}>
-      <DrawerTrigger className="cursor-pointer rounded-full px-4 text-white hover:text-blue-50">
-        <FaList size={64} />
+      <DrawerTrigger className="cursor-pointer rounded-full px-2 text-white hover:text-blue-50">
+        <FaList className="size-8 sm:size-12" />
       </DrawerTrigger>
       <DrawerContent
         data-vaul-no-drag
