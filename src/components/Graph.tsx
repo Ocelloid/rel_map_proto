@@ -63,7 +63,7 @@ export default function Graph() {
       nodeAutoColorBy="group"
       linkOpacity={0.5}
       linkWidth={2}
-      linkCurvature={0.25}
+      linkCurvature={0.1}
       nodeThreeObject={(node) => {
         const nodeMesh = new Mesh(
           node.group === "tags"
