@@ -65,10 +65,13 @@ function CharacterListItem({
   character: Character;
   index: number;
 }) {
-  const { setName, setTags, setEditing, deleteCharacter } = useStore();
+  const { setName, setTags, setColor, setShape, setEditing, deleteCharacter } =
+    useStore();
   const handleEditCharacter = () => {
     setName(character.name);
     setTags(character.tags);
+    setColor(character.color);
+    setShape(character.shape);
     setEditing(true);
     deleteCharacter(index);
   };
