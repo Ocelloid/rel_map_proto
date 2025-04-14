@@ -4,46 +4,21 @@ import {
   CSS2DRenderer,
   CSS2DObject,
 } from "three/addons/renderers/CSS2DRenderer.js";
-import { useStore } from "~/store";
+import { useGraphStore, useCustomLinksStore } from "~/store";
 import dynamic from "next/dynamic";
 import { useEffect, useRef } from "react";
 import { UnrealBloomPass } from "three/addons/postprocessing/UnrealBloomPass.js";
 import type { ForceGraphMethods } from "react-force-graph-3d";
-import {
-  Mesh,
-  Vector2,
-  BoxGeometry,
-  ConeGeometry,
-  CylinderGeometry,
-  DodecahedronGeometry,
-  SphereGeometry,
-  TorusGeometry,
-  TorusKnotGeometry,
-  MeshLambertMaterial,
-} from "three";
+import { Mesh, Vector2, SphereGeometry, MeshLambertMaterial } from "three";
 const Dynamic3DGraph = dynamic(() => import("./Dynamic3DGraph"), {
   ssr: false,
 });
-
-const DEF_MATERIAL = new MeshLambertMaterial({
-  color: Math.round(Math.random() * Math.pow(2, 24)),
-  transparent: true,
-  opacity: 0.75,
-});
-
-export const SHAPES = [
-  { id: "cube", geometry: new BoxGeometry(16, 16, 16) },
-  { id: "cone", geometry: new ConeGeometry(8, 16) },
-  { id: "cylinder", geometry: new CylinderGeometry(8, 8, 16) },
-  { id: "dodecahedron", geometry: new DodecahedronGeometry(10) },
-  { id: "sphere", geometry: new SphereGeometry(10) },
-  { id: "torus", geometry: new TorusGeometry(10, 2) },
-  { id: "knot", geometry: new TorusKnotGeometry(6, 2) },
-];
+import { DEF_MATERIAL, SHAPES } from "./_consts";
 
 export default function Graph() {
   const fgRef = useRef<ForceGraphMethods | undefined>(undefined);
-  const { nodes, links } = useStore();
+  const { nodes, characterLinks } = useGraphStore();
+  const { customLinks } = useCustomLinksStore();
   const extraRenderers = [new CSS2DRenderer()];
   useEffect(() => {
     if (!fgRef.current) return;
@@ -55,11 +30,13 @@ export default function Graph() {
     );
     fgRef.current.postProcessingComposer().addPass(bloomPass);
   }, []);
+  const combinedLinks = [...characterLinks, ...customLinks];
+  console.log(combinedLinks);
   return (
     <Dynamic3DGraph
       ref={fgRef}
       extraRenderers={extraRenderers}
-      graphData={{ nodes, links }}
+      graphData={{ nodes, links: combinedLinks }}
       nodeAutoColorBy="group"
       linkOpacity={0.5}
       linkWidth={2}
@@ -89,6 +66,7 @@ export default function Graph() {
         nodeMesh.add(nodeLabel);
         return nodeMesh;
       }}
+      linkThreeObjectExtend={true}
       showNavInfo={false}
       backgroundColor="#00000000"
       cooldownTicks={40}

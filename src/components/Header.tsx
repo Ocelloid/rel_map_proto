@@ -1,13 +1,14 @@
 "use client";
 import Characters from "~/components/Characters";
 import { Button } from "./ui/button";
-import { useStore, type Character } from "~/store";
+import { useGraphStore, type Character } from "~/store";
 import { FaDownload, FaUpload } from "react-icons/fa";
 import { useRef } from "react";
+import CustomLinks from "./CustomLinks";
 
 export default function Header() {
   const inputRef = useRef<HTMLInputElement>(null);
-  const { characters, setCharacters } = useStore();
+  const { characters, setCharacters } = useGraphStore();
   const downloadJSON = () => {
     const confirmed = confirm(
       `Вы уверены, что хотите сохранить список персонажей?`,
@@ -58,7 +59,10 @@ export default function Header() {
 
   return (
     <div className="fixed top-0 z-50 flex h-16 w-full flex-row items-center justify-between bg-transparent p-4 sm:h-24">
-      <Characters />
+      <div className="flex flex-row items-center gap-4">
+        <Characters />
+        <CustomLinks />
+      </div>
       <div className="flex h-32 flex-row items-center gap-4">
         <Button
           variant={"link"}

@@ -20,15 +20,20 @@ import {
   FaChevronRight,
 } from "react-icons/fa";
 import { ScrollArea } from "~/components/ui/scroll-area";
-import { useStore, type Character } from "~/store";
+import {
+  useCharFormStore,
+  useGraphStore,
+  useCustomLinksStore,
+  type Character,
+} from "~/store";
 import { useState, useEffect } from "react";
 import { Canvas } from "@react-three/fiber";
-import { SHAPES } from "./Graph";
+import { SHAPES, COLORS } from "./_consts";
 import { MeshStandardMaterial, SphereGeometry } from "three";
 
 export default function Characters() {
   const [isOpen, setIsOpen] = useState(false);
-  const { characters } = useStore();
+  const { characters } = useGraphStore();
   useEffect(() => {
     setIsOpen(true);
   }, []);
@@ -71,15 +76,25 @@ function CharacterListItem({
   character: Character;
   index: number;
 }) {
-  const { setName, setTags, setColor, setShape, setEditing, deleteCharacter } =
-    useStore();
+  const {
+    setName,
+    setTags,
+    setColor,
+    setShape,
+    setCharacterEditing,
+    setEditingId,
+  } = useCharFormStore();
+  const { deleteCharacter } = useGraphStore();
+  const { deleteLinksForNode } = useCustomLinksStore();
   const handleEditCharacter = () => {
     setName(character.name);
     setTags(character.tags);
     setColor(character.color);
     setShape(character.shape);
-    setEditing(true);
+    setCharacterEditing(true);
+    setEditingId(character.nodeId);
     deleteCharacter(index);
+    deleteLinksForNode(character.nodeId);
   };
   const handleDeleteCharacter = () => {
     const confirmed = confirm(
@@ -87,6 +102,7 @@ function CharacterListItem({
     );
     if (confirmed) {
       deleteCharacter(index);
+      deleteLinksForNode(character.nodeId);
     }
   };
   return (
@@ -148,31 +164,25 @@ function CharacterForm() {
     tags,
     color,
     shape,
-    editing,
-    addCharacter,
+    editingId,
+    characterEditing,
     setName,
     setTags,
     setColor,
     setShape,
-  } = useStore();
+    setEditingId,
+  } = useCharFormStore();
+  const { addCharacter } = useGraphStore();
+  const { redraw } = useCustomLinksStore();
   const handleSubmit = () => {
-    addCharacter({ name, tags, color, shape });
+    addCharacter(name, tags, color, shape, editingId);
     setName("");
     setTags("");
     setColor("pink");
     setShape("sphere");
+    setEditingId(undefined);
+    redraw();
   };
-  const COLORS = [
-    "red",
-    "orange",
-    "yellow",
-    "green",
-    "blue",
-    "purple",
-    "pink",
-    "brown",
-    "white",
-  ];
   const handlePrevShape = () => {
     const index = SHAPES.findIndex((s) => s.id === shape);
     if (index === 0) {
@@ -274,7 +284,7 @@ function CharacterForm() {
         className="w-full cursor-pointer"
         onClick={handleSubmit}
       >
-        {editing ? "Сохранить" : "Добавить"}
+        {characterEditing ? "Сохранить" : "Добавить"}
       </Button>
     </div>
   );

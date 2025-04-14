@@ -7,9 +7,10 @@ export type Character = {
   tags: string;
   color: string;
   shape: string;
+  nodeId: string;
 };
 
-type GraphNode = {
+export type GraphNode = {
   id: string;
   name: string;
   group: string;
@@ -18,40 +19,103 @@ type GraphNode = {
   val: number;
 };
 
-type GraphLink = {
-  source: string;
-  target: string;
+export type GraphLink = {
+  source: string | GraphNode;
+  target: string | GraphNode;
+  title?: string;
+  color?: string;
 };
 
-interface State {
-  characters: Character[];
-  nodes: GraphNode[];
-  links: GraphLink[];
-  editing: boolean;
+interface LinkFormState {
+  linkEditing: boolean;
+  color: string;
+  title: string;
+  source: string;
+  target: string;
+}
+
+interface LinkFormActions {
+  setLinkEditing: (linkEditing: boolean) => void;
+  setColor: (color: string) => void;
+  setTitle: (title: string) => void;
+  setSource: (source: string) => void;
+  setTarget: (target: string) => void;
+}
+
+interface CharFormState {
+  characterEditing: boolean;
   name: string;
   tags: string;
   color: string;
   shape: string;
+  editingId?: string;
 }
 
-interface Actions {
-  setCharacters: (characters: Character[]) => void;
-  addCharacter: (character: Character) => void;
-  deleteCharacter: (index: number) => void;
-  setEditing: (editing: boolean) => void;
+interface CharFormActions {
+  setCharacterEditing: (characterEditing: boolean) => void;
   setName: (name: string) => void;
   setTags: (tags: string) => void;
   setColor: (color: string) => void;
   setShape: (shape: string) => void;
+  setEditingId: (editingId?: string) => void;
 }
+
+interface GraphState {
+  characters: Character[];
+  nodes: GraphNode[];
+  characterLinks: GraphLink[];
+  characterEditing: boolean;
+  linkEditing: boolean;
+  name: string;
+  tags: string;
+  color: string;
+  shape: string;
+  title: string;
+  source: string;
+  target: string;
+  editingId?: string;
+}
+
+interface GraphActions {
+  setCharacters: (characters: Character[]) => void;
+  addCharacter: (
+    name: string,
+    tags: string,
+    color: string,
+    shape: string,
+    editingId?: string,
+  ) => void;
+  deleteCharacter: (index: number) => void;
+  setCharacterEditing: (characterEditing: boolean) => void;
+  setName: (name: string) => void;
+  setTags: (tags: string) => void;
+  setColor: (color: string) => void;
+  setShape: (shape: string) => void;
+  setLinkEditing: (linkEditing: boolean) => void;
+  setTitle: (title: string) => void;
+  setSource: (source: string) => void;
+  setTarget: (target: string) => void;
+  setEditingId: (editingId?: string) => void;
+}
+
+type CustomLinksState = {
+  customLinks: GraphLink[];
+};
+
+type CustomLinksActions = {
+  setCustomLinks: (customLinks: GraphLink[]) => void;
+  addCustomLink: (customLink: GraphLink) => void;
+  deleteCustomLink: (index: number) => void;
+  deleteLinksForNode: (nodeId: string) => void;
+  redraw: () => void;
+};
 
 function CharactersToGraph(characters: Character[]) {
   const nodes: GraphNode[] = [];
-  const links: GraphLink[] = [];
+  const characterLinks: GraphLink[] = [];
   characters.forEach((character) => {
-    const characterId = createId();
     nodes.push({
-      id: characterId,
+      id: character.nodeId,
       name: character.name,
       color: character.color,
       shape: character.shape,
@@ -68,28 +132,86 @@ function CharactersToGraph(characters: Character[]) {
           group: "tags",
           val: 5,
         });
-      links.push({
-        source: characterId,
+      characterLinks.push({
+        source: character.nodeId,
         target: trimmed,
       });
     });
   });
-  return { nodes, links };
+  return { nodes, characterLinks };
 }
 
-export const useStore = create(
-  persist<State & Actions>(
+export const useCustomLinksStore = create(
+  persist<CustomLinksState & CustomLinksActions>(
+    (set, get) => ({
+      customLinks: [],
+      setCustomLinks: (customLinks) => {
+        set({ customLinks });
+      },
+      addCustomLink: (customLink) => {
+        const newCustomLinks = [...get().customLinks, customLink];
+        set({ customLinks: newCustomLinks });
+      },
+      deleteCustomLink: (index) => {
+        const customLinksCopy = [...get().customLinks];
+        customLinksCopy.splice(index, 1);
+        set({ customLinks: customLinksCopy });
+      },
+      redraw: () => {
+        const oldLinks = [...get().customLinks];
+        set({ customLinks: [] });
+        set({ customLinks: oldLinks });
+      },
+      deleteLinksForNode(nodeId) {
+        const oldLinks = [...get().customLinks];
+        set({
+          customLinks: oldLinks.filter(
+            (link) =>
+              link.source !== nodeId &&
+              link.target !== nodeId &&
+              (link.source as GraphNode).id !== nodeId &&
+              (link.target as GraphNode).id !== nodeId,
+          ),
+        });
+      },
+    }),
+    { name: "rhizome-custom-links-storage" },
+  ),
+);
+
+export const useGraphStore = create(
+  persist<GraphState & GraphActions>(
     (set, get) => ({
       characters: [],
       nodes: [],
-      links: [],
+      characterLinks: [],
       name: "",
       tags: "",
       color: "pink",
       shape: "sphere",
-      editing: false,
-      setEditing: (editing) => {
-        set({ editing });
+      characterEditing: false,
+      linkEditing: false,
+      source: "",
+      target: "",
+      title: "",
+      editingId: undefined,
+      setEditingId: (editingId) => {
+        set({ editingId });
+      },
+      setTitle: (title) => {
+        set({ title });
+      },
+      setSource: (source) => {
+        set({ source });
+      },
+      setTarget: (target) => {
+        set({ target });
+      },
+      setLinkEditing: (linkEditing) => {
+        set({ linkEditing });
+      },
+      setCharacterEditing: (characterEditing) => {
+        set({ characterEditing });
       },
       setName: (name) => {
         set({ name });
@@ -104,34 +226,101 @@ export const useStore = create(
         set({ shape });
       },
       setCharacters: (characters) => {
-        const { nodes, links } = CharactersToGraph(characters);
+        const { nodes, characterLinks } = CharactersToGraph(characters);
         set({
           characters,
           nodes,
-          links,
+          characterLinks,
         });
       },
-      addCharacter: (character) => {
-        const newCharacters = [...get().characters, character];
-        const { nodes, links } = CharactersToGraph(newCharacters);
+      addCharacter: (name, tags, color, shape, editingId) => {
+        const newCharacter = {
+          name,
+          tags,
+          color,
+          shape,
+          nodeId: editingId ?? createId(),
+        };
+        const newCharacters = [...get().characters, newCharacter];
+        const { nodes, characterLinks } = CharactersToGraph(newCharacters);
         set({
           characters: newCharacters,
-          editing: false,
+          characterEditing: false,
           nodes,
-          links,
+          characterLinks,
         });
       },
       deleteCharacter: (index) => {
         const charactersCopy = [...get().characters];
         charactersCopy.splice(index, 1);
-        const { nodes, links } = CharactersToGraph(charactersCopy);
+        const { nodes, characterLinks } = CharactersToGraph(charactersCopy);
         set({
           characters: charactersCopy,
           nodes,
-          links,
+          characterLinks,
         });
       },
     }),
-    { name: "rhizome-storage" },
+    { name: "rhizome-graph-storage" },
+  ),
+);
+
+export const useCharFormStore = create(
+  persist<CharFormState & CharFormActions>(
+    (set) => ({
+      name: "",
+      tags: "",
+      color: "pink",
+      shape: "sphere",
+      characterEditing: false,
+      editingId: undefined,
+      setEditingId: (editingId) => {
+        set({ editingId });
+      },
+      setCharacterEditing: (characterEditing) => {
+        set({ characterEditing });
+      },
+      setName: (name) => {
+        set({ name });
+      },
+      setTags: (tags) => {
+        set({ tags });
+      },
+      setColor: (color) => {
+        set({ color });
+      },
+      setShape: (shape) => {
+        set({ shape });
+      },
+    }),
+    { name: "rhizome-char-form-storage" },
+  ),
+);
+
+export const useLinkFormStore = create(
+  persist<LinkFormState & LinkFormActions>(
+    (set) => ({
+      color: "pink",
+      linkEditing: false,
+      source: "",
+      target: "",
+      title: "",
+      setColor: (color) => {
+        set({ color });
+      },
+      setTitle: (title) => {
+        set({ title });
+      },
+      setSource: (source) => {
+        set({ source });
+      },
+      setTarget: (target) => {
+        set({ target });
+      },
+      setLinkEditing: (linkEditing) => {
+        set({ linkEditing });
+      },
+    }),
+    { name: "rhizome-link-form-storage" },
   ),
 );
