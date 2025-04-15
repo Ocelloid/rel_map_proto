@@ -16,7 +16,6 @@ import {
   MeshLambertMaterial,
   Vector3,
 } from "three";
-import SpriteText from "three-spritetext";
 const Dynamic3DGraph = dynamic(() => import("./Dynamic3DGraph"), {
   ssr: false,
 });
@@ -81,11 +80,14 @@ export default function Graph() {
       linkDirectionalParticles={4}
       linkDirectionalParticleWidth={(link) => (link.group === "custom" ? 1 : 0)}
       linkThreeObject={(link) => {
-        // extend link with text sprite
-        const sprite = new SpriteText(link.title as string);
-        sprite.color = "black";
-        sprite.textHeight = 1.5;
-        return sprite;
+        const nodeEl = document.createElement("div");
+        nodeEl.textContent = link.title;
+        nodeEl.style.color = "antiquewhite";
+        nodeEl.style.fontSize = ".75rem";
+        nodeEl.style.textShadow =
+          "-1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000";
+        nodeEl.className = "node-label";
+        return new CSS2DObject(nodeEl);
       }}
       linkPositionUpdate={(sprite, { start, end }) => {
         const calcMiddle = (a: number, b: number) => b + (a - b) / 2;
@@ -102,6 +104,11 @@ export default function Graph() {
         node.fx = node.x;
         node.fy = node.y;
         node.fz = node.z;
+      }}
+      onNodeClick={(node) => {
+        node.fx = undefined;
+        node.fy = undefined;
+        node.fz = undefined;
       }}
     />
   );
