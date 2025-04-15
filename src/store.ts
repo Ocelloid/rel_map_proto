@@ -98,6 +98,7 @@ interface GraphActions {
   setSource: (source: string) => void;
   setTarget: (target: string) => void;
   setEditingId: (editingId?: string) => void;
+  redraw: () => void;
 }
 
 type CustomLinksState = {
@@ -151,8 +152,10 @@ export const useCustomLinksStore = create(
         set({
           customLinks: customLinks.map((link) => ({
             index: link.index,
-            source: (link.source as GraphNode).id,
-            target: (link.target as GraphNode).id,
+            source:
+              typeof link.source === "string" ? link.source : link.source.id,
+            target:
+              typeof link.target === "string" ? link.target : link.target.id,
             title: link.title,
             color: link.color,
             group: link.group,
@@ -174,8 +177,10 @@ export const useCustomLinksStore = create(
         set({
           customLinks: oldLinks.map((link) => ({
             index: link.index,
-            source: (link.source as GraphNode).id,
-            target: (link.target as GraphNode).id,
+            source:
+              typeof link.source === "string" ? link.source : link.source.id,
+            target:
+              typeof link.target === "string" ? link.target : link.target.id,
             title: link.title,
             color: link.color,
             group: link.group,
@@ -187,10 +192,12 @@ export const useCustomLinksStore = create(
         set({
           customLinks: oldLinks.filter(
             (link) =>
-              link.source !== nodeId &&
-              link.target !== nodeId &&
-              (link.source as GraphNode).id !== nodeId &&
-              (link.target as GraphNode).id !== nodeId,
+              (typeof link.target === "string"
+                ? link.target
+                : link.target.id) !== nodeId &&
+              (typeof link.source === "string"
+                ? link.source
+                : link.source.id) !== nodeId,
           ),
         });
         get().redraw();
@@ -245,6 +252,18 @@ export const useGraphStore = create(
       },
       setShape: (shape) => {
         set({ shape });
+      },
+      redraw: () => {
+        console.log("redraw");
+        set({
+          characterLinks: get().characterLinks.map((link) => ({
+            ...link,
+            source:
+              typeof link.source === "string" ? link.source : link.source.id,
+            target:
+              typeof link.target === "string" ? link.target : link.target.id,
+          })),
+        });
       },
       setCharacters: (characters) => {
         const { nodes, characterLinks } = CharactersToGraph(characters);

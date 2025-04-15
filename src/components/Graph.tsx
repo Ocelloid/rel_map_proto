@@ -23,7 +23,7 @@ import { DEF_MATERIAL, SHAPES } from "./_consts";
 
 export default function Graph() {
   const fgRef = useRef<ForceGraphMethods | undefined>(undefined);
-  const { nodes, characterLinks } = useGraphStore();
+  const { nodes, characterLinks, redraw } = useGraphStore();
   const { customLinks } = useCustomLinksStore();
   const extraRenderers = [new CSS2DRenderer()];
   useEffect(() => {
@@ -37,7 +37,11 @@ export default function Graph() {
     fgRef.current.postProcessingComposer().addPass(bloomPass);
   }, []);
   const combinedLinks = [...characterLinks, ...customLinks];
-  console.log(combinedLinks);
+  useEffect(() => {
+    setTimeout(() => redraw(), 500);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   return (
     <Dynamic3DGraph
       ref={fgRef}
@@ -74,7 +78,7 @@ export default function Graph() {
       }}
       linkThreeObjectExtend={true}
       showNavInfo={false}
-      backgroundColor="#00000000"
+      backgroundColor="#d4cccc00"
       cooldownTicks={40}
       onEngineStop={() => fgRef?.current?.zoomToFit(400)}
       linkDirectionalParticles={4}

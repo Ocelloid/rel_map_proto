@@ -30,7 +30,6 @@ import {
   useGraphStore,
   useLinkFormStore,
   type GraphLink,
-  type GraphNode,
 } from "~/store";
 import { COLORS } from "./_consts";
 
@@ -168,8 +167,16 @@ function LinkListItem({
   const { deleteCustomLink } = useCustomLinksStore();
   const { nodes } = useGraphStore();
   const handleEditCustomLink = () => {
-    setSource((customLink.source as GraphNode).id);
-    setTarget((customLink.target as GraphNode).id);
+    setSource(
+      typeof customLink.source === "string"
+        ? customLink.source
+        : customLink.source.id,
+    );
+    setTarget(
+      typeof customLink.target === "string"
+        ? customLink.target
+        : customLink.target.id,
+    );
     setTitle(customLink.title ?? "");
     setLinkEditing(true);
     deleteCustomLink(index);
@@ -192,16 +199,20 @@ function LinkListItem({
             {
               characters.find(
                 (c) =>
-                  c.id === customLink.source ||
-                  c.id === (customLink.source as GraphNode).id,
+                  c.id ===
+                  (typeof customLink.source === "string"
+                    ? customLink.source
+                    : customLink.source.id),
               )?.name
             }
             &nbsp;&rarr;{" "}
             {
               characters.find(
                 (c) =>
-                  c.id === customLink.target ||
-                  c.id === (customLink.target as GraphNode).id,
+                  c.id ===
+                  (typeof customLink.target === "string"
+                    ? customLink.target
+                    : customLink.target.id),
               )?.name
             }
           </div>
