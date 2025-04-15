@@ -1,4 +1,5 @@
 "use client";
+import Footer from "~/components/Footer";
 import Header from "~/components/Header";
 import Graph from "~/components/Graph";
 import NoSSR from "~/components/NoSSR";
@@ -9,6 +10,7 @@ export default function HomePage() {
       <NoSSR>
         <Graph />
       </NoSSR>
+      <Footer />
     </main>
   );
 }

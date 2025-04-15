@@ -41,7 +41,10 @@ export default function Graph() {
   }, []);
   const combinedLinks = [...characterLinks, ...customLinks];
   useEffect(() => {
-    setTimeout(() => redraw(), 500);
+    setTimeout(() => {
+      redraw();
+      fgRef?.current?.zoomToFit(400);
+    }, 500);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   return (
@@ -82,7 +85,7 @@ export default function Graph() {
       showNavInfo={false}
       backgroundColor="#d4cccc00"
       cooldownTicks={40}
-      onEngineStop={() => fgRef?.current?.zoomToFit(400)}
+      d3VelocityDecay={0.8}
       linkDirectionalParticles={4}
       linkDirectionalParticleWidth={(link) => (link.group === "custom" ? 1 : 0)}
       linkThreeObject={(link) => {
