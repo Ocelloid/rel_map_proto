@@ -6,7 +6,7 @@ import {
 } from "three/addons/renderers/CSS2DRenderer.js";
 import { useGraphStore, useCustomLinksStore } from "~/store";
 import dynamic from "next/dynamic";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { UnrealBloomPass } from "three/addons/postprocessing/UnrealBloomPass.js";
 import type { ForceGraphMethods } from "react-force-graph-3d";
 import {
@@ -26,6 +26,9 @@ export default function Graph() {
   const { nodes, characterLinks, redraw } = useGraphStore();
   const { customLinks } = useCustomLinksStore();
   const extraRenderers = [new CSS2DRenderer()];
+  const [fixedNodes, setFixedNodes] = useState<(string | number | undefined)[]>(
+    [],
+  );
   useEffect(() => {
     if (!fgRef.current) return;
     const bloomPass = new UnrealBloomPass(
@@ -41,7 +44,6 @@ export default function Graph() {
     setTimeout(() => redraw(), 500);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
   return (
     <Dynamic3DGraph
       ref={fgRef}
@@ -67,7 +69,7 @@ export default function Graph() {
         );
         const nodeEl = document.createElement("div");
         nodeEl.textContent = node.name;
-        nodeEl.style.color = "white";
+        nodeEl.style.color = fixedNodes.includes(node.id) ? "yellow" : "white";
         nodeEl.style.fontSize = node.group === "tags" ? "1rem" : "1.5rem";
         nodeEl.style.textShadow =
           "-1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000";
@@ -108,11 +110,13 @@ export default function Graph() {
         node.fx = node.x;
         node.fy = node.y;
         node.fz = node.z;
+        setFixedNodes((prev) => [...new Set([...prev, node.id])]);
       }}
       onNodeClick={(node) => {
         node.fx = undefined;
         node.fy = undefined;
         node.fz = undefined;
+        setFixedNodes((prev) => prev.filter((id) => id !== node.id));
       }}
     />
   );
