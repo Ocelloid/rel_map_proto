@@ -171,7 +171,16 @@ export const useCustomLinksStore = create(
       redraw: () => {
         const oldLinks = [...get().customLinks];
         set({ customLinks: [] });
-        set({ customLinks: oldLinks });
+        set({
+          customLinks: oldLinks.map((link) => ({
+            index: link.index,
+            source: (link.source as GraphNode).id,
+            target: (link.target as GraphNode).id,
+            title: link.title,
+            color: link.color,
+            group: link.group,
+          })),
+        });
       },
       deleteLinksForNode(nodeId) {
         const oldLinks = [...get().customLinks];
@@ -184,6 +193,7 @@ export const useCustomLinksStore = create(
               (link.target as GraphNode).id !== nodeId,
           ),
         });
+        get().redraw();
       },
     }),
     { name: "rhizome-custom-links-storage" },
