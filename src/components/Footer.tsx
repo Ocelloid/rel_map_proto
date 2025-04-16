@@ -16,7 +16,7 @@ export default function Footer() {
       <Wave
         fill="#3a40ff"
         paused={false}
-        className="absolute bottom-0 z-40 flex h-1/6 w-full items-center justify-center sm:h-1/10"
+        className="pointer-events-none absolute bottom-0 z-40 flex h-1/6 w-full items-center justify-center sm:h-1/10"
         options={{
           height: 20,
           amplitude: 20,
